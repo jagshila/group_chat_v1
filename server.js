@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const app = require('./config/app');
 const http = createServer(app);
 const { Server } = require('socket.io');
+
 require('dotenv').config();
 
 const io = new Server(http, {

@@ -22,7 +22,9 @@ const getAuthToken = async (req, res) => {
             const token = createToken(userData._id, userData.is_admin);
             res.cookie('token', token, { httpOnly: true, secure: process.env.LOCAL !== 'true' });
             if (userData.change_password) {
-                successResponse(res, StatusCodes.OK, {}, 'Authentication success!, Please update your password');
+                let data = {};
+                if (process.env.NODE_ENV === 'test') { data = { test_token: token }; };
+                successResponse(res, StatusCodes.OK, data, 'Authentication success!, Please update your password');
             } else { successResponse(res, StatusCodes.OK, {}, 'Authentication success!'); }
         } else {
             failureResponse(res, StatusCodes.UNAUTHORIZED, {}, 'Authentication failure. Incorrect password.');

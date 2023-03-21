@@ -73,7 +73,7 @@ const createGroup = async (req, res) => {
         await JoinedGroups.updateOne({ user_id: res.locals.userId }, {
             $push: { joined_groups: { message_viewed: 0, group_id: newGroup._id } }
         }, { upsert: true });
-        successResponse(res, StatusCodes.CREATED, { user_name: newGroup.group_name },
+        successResponse(res, StatusCodes.CREATED, { group_name: newGroup.group_name, group_id: newGroup._id },
             `Group: ${newGroup.group_name} created successfully`);
     } catch (e) {
         console.log(e);
@@ -163,12 +163,13 @@ const getGroupMembers = async (req, res) => {
         }
     } catch (e) { page = 1; }
     try {
-        const members = await Group.find({ _id: id }, { members: { $slice: [(page - 1) * maxRecords, maxRecords + 1] } });
+        const memberData = await Group.findOne({ _id: id }, { members: { $slice: [(page - 1) * maxRecords, maxRecords + 1] } });
+        const members = memberData.members;
         const pagination = {
             prev: page === 1 ? '' : `/groups/:${id}/members?page=${page - 1}`,
             next: members.length > maxRecords ? `/groups/:${id}/members?page=${page + 1}` : ''
         };
-        successResponse(res, StatusCodes.OK, { members: members.slice(0, maxRecords), pagination }, 'Members fetched successfully');
+        successResponse(res, StatusCodes.OK, { members: members.slice(0, maxRecords).filter(m => !m.is_deleted), pagination }, 'Members fetched successfully');
     } catch (e) {
         console.log(e);
         failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error fetching data');
@@ -197,7 +198,6 @@ const addGroupMember = async (req, res) => {
             return failureResponse(res, StatusCodes.NOT_FOUND, {}, `Group with id: ${groupId} not found`);
         }
         const alreadyJoined = await JoinedGroups.findOne({ user_id: userId, 'joined_groups.group_id': groupId }, { 'joined_groups.$': 1 });
-        console.log(alreadyJoined);
         if (alreadyJoined) {
             if (alreadyJoined.joined_groups[0].is_deleted === true) {
                 await Group.updateOne({ _id: groupId, 'members.user_id': userId }, {

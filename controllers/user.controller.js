@@ -81,7 +81,7 @@ const createUser = async (req, res) => {
             is_admin: !!data.is_admin
         });
         const newUser = await user.save();
-        successResponse(res, StatusCodes.CREATED, { user_name: newUser.user_name },
+        successResponse(res, StatusCodes.CREATED, { user_name: newUser.user_name, user_id: newUser._id },
             `User with user_name: ${newUser.user_name} created successfully`);
     } catch (e) {
         if (e.code === 11000) {

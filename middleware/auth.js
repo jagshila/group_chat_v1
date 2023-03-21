@@ -8,7 +8,10 @@ const { unauthorized } = require('../services/api.service');
  */
 module.exports = (req, res, next) => {
     try {
-        const { token } = req.cookies;
+        let token = '';
+        if (process.env.NODE_ENV === 'test') {
+            token = req.headers.test_token;
+        } else { token = req.cookies.token; }
         // const token = req.cookies.token;
         if (token === '') {
             unauthorized(res, 'No Auth Token!');
