@@ -1,7 +1,7 @@
 const Group = require('../models/schema/group.model');
 const User = require('../models/schema/user.model');
 const JoinedGroups = require('../models/schema/joinedgroup.model');
-
+const { ObjectId } = require('mongoose').Types;
 const { StatusCodes, successResponse, failureResponse } = require('../services/api.service');
 const { checkType } = require('../helpers/checkType');
 
@@ -192,7 +192,7 @@ const addGroupMember = async (req, res) => {
         if (!user) {
             return failureResponse(res, StatusCodes.NOT_FOUND, {}, `User with id: ${userId} not found`);
         }
-        const group = await Group.findOne({ _id: groupId, id_deleted: false }, { message_count: 1 });
+        const group = await Group.findOne({ _id: new ObjectId(groupId), id_deleted: false }, { message_count: 1 });
         if (!group) {
             return failureResponse(res, StatusCodes.NOT_FOUND, {}, `Group with id: ${groupId} not found`);
         }
