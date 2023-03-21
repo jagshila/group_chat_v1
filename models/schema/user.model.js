@@ -23,6 +23,10 @@ const UserSchema = new Schema({
     },
     user_image: {
         type: String
+    },
+    change_password: {
+        type: Boolean,
+        default: true
     }
 }, { timestamps: true, collection: 'users' });
 

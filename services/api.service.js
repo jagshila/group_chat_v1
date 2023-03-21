@@ -29,11 +29,20 @@ const parameterMissing = (res, msg = 'Parameter missing') => {
     res.status(StatusCodes.BAD_REQUEST).json({ success: false, data: {}, msg });
 };
 
+const errorResponse = (res, error, msg = 'Something went wrong at server') => {
+    if (error.kind === 'ObjectId') {
+        return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Malformed Url or Data not proper');
+    }
+
+    failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, msg);
+};
+
 module.exports = {
     StatusCodes,
     successResponse,
     failureResponse,
     notFound,
     unauthorized,
-    parameterMissing
+    parameterMissing,
+    errorResponse
 };

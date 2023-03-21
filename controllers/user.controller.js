@@ -1,6 +1,6 @@
 const User = require('../models/schema/user.model');
 const md5 = require('md5');
-const { StatusCodes, successResponse, failureResponse } = require('../services/api.service');
+const { StatusCodes, successResponse, failureResponse, errorResponse } = require('../services/api.service');
 const { checkType } = require('../helpers/checkType');
 
 /**
@@ -18,8 +18,7 @@ const getUser = async (req, res) => {
             failureResponse(res, StatusCodes.NOT_FOUND, {}, 'Specified user data not found');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error fetching data');
+        errorResponse(res, e, 'Error fetching data');
     }
 };
 
@@ -45,7 +44,7 @@ const getUsers = async (req, res) => {
         //     { score: { $meta: 'textScore' }, display_name: 1, user_name: 1 })
         //     .sort({ created_data: 1, score: 1 }).skip((page - 1) * maxRecords).limit(maxRecords + 1);
 
-        const users = await User.find({ $or: [{ user_name: query }, { display_name: query }] })
+        const users = await User.find({ $or: [{ user_name: query }, { display_name: query }] }, { password: 0, change_password: 0 })
             .skip((page - 1) * maxRecords).limit(maxRecords + 1);
         const pagination = {
             prev: page === 1 ? '' : `/users?page=${page - 1}`,
@@ -112,12 +111,15 @@ const updateUser = async (req, res) => {
             if (!checkType(data, checkObj, res)) { return; };
             const dataToUpdate = {};
             if (data.display_name) { dataToUpdate.display_name = data.display_name; }
-            if (data.password) { dataToUpdate.password = md5(data.password); }
+            if (data.password) {
+                dataToUpdate.password = md5(data.password);
+                dataToUpdate.change_password = false;
+            }
             if (data.bio) { dataToUpdate.bio = data.bio; }
             if (data.user_image) { dataToUpdate.user_image = data.user_image; }
             if (res.locals.admin && data.is_admin) { dataToUpdate.is_admin = data.is_admin; }
             const result = await User.updateOne({ _id: id }, dataToUpdate);
-            console.log(result);
+
             if (result.matchedCount) {
                 if (result.modifiedCount) {
                     successResponse(res, StatusCodes.OK, {}, 'User details updated successfully');
