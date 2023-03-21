@@ -8,15 +8,9 @@ const { unauthorized } = require('../services/api.service');
  */
 module.exports = (req, res, next) => {
     try {
-        res.locals.admin = true;
-        res.locals.userId = '6415eff0fa5dc3c2cb38188d';
-        return next();
-        const token = req.cookies.token;
+        const { token } = req.cookies;
+        // const token = req.cookies.token;
         if (token === '') {
-            res.status(401).json({
-                error: new Error('No Auth Token!')
-            });
-
             unauthorized(res, 'No Auth Token!');
             return;
         }
@@ -30,9 +24,7 @@ module.exports = (req, res, next) => {
         } else {
             unauthorized(res, data.msg);
         }
-    } catch {
-        res.status(401).json({
-            error: new Error('Invalid request!')
-        });
+    } catch (e) {
+        unauthorized(res, 'Invalid request');
     }
 };
