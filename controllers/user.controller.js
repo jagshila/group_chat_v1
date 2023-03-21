@@ -73,6 +73,8 @@ const createUser = async (req, res) => {
     if (!checkType(data, checkObj, res)) { return; };
 
     try {
+        if (data.user_name === 'sys') { return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Username sys not allowed!'); }
+
         const user = new User({
             user_name: data.user_name,
             display_name: data.display_name ? data.display_name : data.user_name,
