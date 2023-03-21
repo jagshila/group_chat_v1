@@ -34,6 +34,10 @@ const errorResponse = (res, error, msg = 'Something went wrong at server') => {
         return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Malformed Url or Data not proper');
     }
 
+    if (error.code === 11000) {
+        return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Duplicate entries not allowed');
+    }
+
     failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, msg);
 };
 

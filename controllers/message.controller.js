@@ -1,4 +1,4 @@
-const { StatusCodes, successResponse, failureResponse } = require('../services/api.service');
+const { StatusCodes, successResponse, failureResponse, errorResponse } = require('../services/api.service');
 const Group = require('../models/schema/group.model');
 const JoinedGroups = require('../models/schema/joinedgroup.model');
 const Messages = require('../models/schema/message.model');
@@ -79,8 +79,7 @@ const getUserMessages = async (req, res) => {
 
         successResponse(res, StatusCodes.OK, { messages, pagination }, 'Messages fetched successfully');
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error fetching data');
+        errorResponse(res, e, 'Error fetching data');
     }
 };
 
@@ -111,8 +110,7 @@ const addUserMessage = async (req, res) => {
 
         successResponse(res, StatusCodes.OK, {}, 'Message added successfully');
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error updating data');
+        errorResponse(res, e, 'Error updating data');
     }
 };
 
@@ -130,15 +128,13 @@ const addMessageLike = async (req, res) => {
                 $inc: { 'messages.$.likes': 1 }
             });
 
-        console.log(updated);
         if (updated.modifiedCount) {
             return successResponse(res, StatusCodes.OK, {}, 'Message liked successfully');
         } else {
             return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Message not found in this group');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error updating data');
+        errorResponse(res, e, 'Error updating data');
     }
 };
 

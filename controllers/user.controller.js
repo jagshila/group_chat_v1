@@ -52,8 +52,7 @@ const getUsers = async (req, res) => {
         };
         successResponse(res, StatusCodes.OK, { users: users.slice(0, maxRecords), pagination }, 'Users fetched successfully');
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error fetching data');
+        errorResponse(res, e, 'Error fetching data');
     }
 };
 
@@ -84,11 +83,7 @@ const createUser = async (req, res) => {
         successResponse(res, StatusCodes.CREATED, { user_name: newUser.user_name, user_id: newUser._id },
             `User with user_name: ${newUser.user_name} created successfully`);
     } catch (e) {
-        if (e.code === 11000) {
-            return failureResponse(res, StatusCodes.BAD_REQUEST, {}, `Username: ${req.body.user_name} already in used`);
-        }
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error inserting data');
+        errorResponse(res, e, 'Error inserting data');
     }
 };
 
@@ -131,8 +126,7 @@ const updateUser = async (req, res) => {
             failureResponse(res, StatusCodes.FORBIDDEN, {}, 'User update access denied');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error updating data');
+        errorResponse(res, e, 'Error updating data');
     }
 };
 

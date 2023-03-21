@@ -2,7 +2,7 @@ const Group = require('../models/schema/group.model');
 const User = require('../models/schema/user.model');
 const JoinedGroups = require('../models/schema/joinedgroup.model');
 const { ObjectId } = require('mongoose').Types;
-const { StatusCodes, successResponse, failureResponse } = require('../services/api.service');
+const { StatusCodes, successResponse, failureResponse, errorResponse } = require('../services/api.service');
 const { checkType } = require('../helpers/checkType');
 
 /**
@@ -19,8 +19,7 @@ const getGroup = async (req, res) => {
             failureResponse(res, StatusCodes.NOT_FOUND, {}, 'Specified group data not found');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error fetching data');
+        errorResponse(res, e, 'Error fetching data');
     }
 };
 
@@ -43,8 +42,7 @@ const getGroups = async (req, res) => {
 
         successResponse(res, StatusCodes.OK, { groups }, 'Groups fetched successfully');
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error fetching data');
+        errorResponse(res, e, 'Error fetching data');
     }
 };
 
@@ -76,8 +74,7 @@ const createGroup = async (req, res) => {
         successResponse(res, StatusCodes.CREATED, { group_name: newGroup.group_name, group_id: newGroup._id },
             `Group: ${newGroup.group_name} created successfully`);
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error inserting data');
+        errorResponse(res, e, 'Error inserting data');
     }
 };
 
@@ -115,8 +112,7 @@ const updateGroup = async (req, res) => {
             failureResponse(res, StatusCodes.FORBIDDEN, {}, 'You donot have access to update this group');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error updating data');
+        errorResponse(res, e, 'Error updating data');
     }
 };
 
@@ -142,8 +138,7 @@ const deleteGroup = async (req, res) => {
             failureResponse(res, StatusCodes.FORBIDDEN, {}, 'You donot have access to delete this group');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error updating data');
+        errorResponse(res, e, 'Error updating data');
     }
 };
 
@@ -171,8 +166,7 @@ const getGroupMembers = async (req, res) => {
         };
         successResponse(res, StatusCodes.OK, { members: members.slice(0, maxRecords).filter(m => !m.is_deleted), pagination }, 'Members fetched successfully');
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error fetching data');
+        errorResponse(res, e, 'Error fetching data');
     }
 };
 
@@ -238,8 +232,7 @@ const addGroupMember = async (req, res) => {
 
         successResponse(res, StatusCodes.OK, {}, 'User successfully added to group');
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error inserting data');
+        errorResponse(res, e, 'Error inserting data');
     }
 };
 
@@ -270,8 +263,7 @@ const updateMemberRights = async (req, res) => {
             failureResponse(res, StatusCodes.FORBIDDEN, {}, 'You donot have access to delete this group');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error updating data');
+        errorResponse(res, e, 'Error updating data');
     }
 };
 
@@ -309,8 +301,7 @@ const removeGroupMember = async (req, res) => {
             failureResponse(res, StatusCodes.FORBIDDEN, {}, 'You donot have access to remove user from this group');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error updating data');
+        errorResponse(res, e, 'Error updating data');
     }
 };
 

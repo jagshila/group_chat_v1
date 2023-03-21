@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const UserRoutes = require('../routes/user.route');
 const GroupRoutes = require('../routes/group.route');
 const AuthRoutes = require('../routes/auth.route');
+const { successResponse, StatusCodes } = require('../services/api.service');
 
 const app = express();
 
@@ -15,7 +16,7 @@ const startTime = (new Date()).toLocaleString();
 
 /* API root */
 app.get('/', (req, res) => {
-    res.status(200).json({ alive: 'True', start_time: startTime });
+    successResponse(res, StatusCodes.OK, { alive: 'True', start_time: startTime }, 'Server working');
 });
 
 /* Telling the server to use the routes */

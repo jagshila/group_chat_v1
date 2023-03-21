@@ -1,7 +1,7 @@
 const User = require('../models/schema/user.model');
 const { checkType } = require('../helpers/checkType');
 const md5 = require('md5');
-const { failureResponse, StatusCodes, successResponse } = require('../services/api.service');
+const { failureResponse, StatusCodes, successResponse, errorResponse } = require('../services/api.service');
 const { createToken } = require('../models/jwt.model');
 
 const getAuthToken = async (req, res) => {
@@ -30,8 +30,7 @@ const getAuthToken = async (req, res) => {
             failureResponse(res, StatusCodes.UNAUTHORIZED, {}, 'Authentication failure. Incorrect password.');
         }
     } catch (e) {
-        console.log(e);
-        failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, 'Error inserting data');
+        errorResponse(res, e, 'Auth error');
     }
 };
 
