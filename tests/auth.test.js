@@ -15,8 +15,8 @@ afterEach(async () => {
 describe('POST /api/login', () => {
     it('should set user auth', async () => {
         const res = await request(app).post('/api/login').send({
-            user_name: 'admin',
-            password: 'admin123'
+            user_name: process.env.TEST_ADMIN_USER_NAME,
+            password: process.env.TEST_ADMIN_PASSWORD
         });
         expect(res.statusCode).toBe(200);
         expect(res.body.success).toBe(true);

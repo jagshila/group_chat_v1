@@ -130,9 +130,25 @@ const updateUser = async (req, res) => {
     }
 };
 
+const checkAndAddTestAdminUser = async () => {
+    if (process.env.TEST_ADMIN_USER_NAME && process.env.TEST_ADMIN_PASSWORD) {
+        const userPresent = await User.exists({ user_name: process.env.TEST_ADMIN_USER_NAME });
+        if (!userPresent) {
+            const user = new User({
+                user_name: process.env.TEST_ADMIN_USER_NAME,
+                display_name: process.env.TEST_ADMIN_USER_NAME,
+                password: md5(process.env.TEST_ADMIN_PASSWORD),
+                is_admin: true
+            });
+            await user.save();
+        }
+    }
+};
+
 module.exports = {
     getUser,
     getUsers,
     createUser,
-    updateUser
+    updateUser,
+    checkAndAddTestAdminUser
 };
