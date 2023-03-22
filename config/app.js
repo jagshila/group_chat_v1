@@ -4,7 +4,8 @@ const UserRoutes = require('../routes/user.route');
 const GroupRoutes = require('../routes/group.route');
 const AuthRoutes = require('../routes/auth.route');
 const { successResponse, StatusCodes } = require('../services/api.service');
-
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../swagger-output.json');
 const app = express();
 
 /* A middleware that parses the body of the request and makes it available in the req.body object. */
@@ -23,5 +24,11 @@ app.get('/', (req, res) => {
 app.use('/api', UserRoutes);
 app.use('/api', GroupRoutes);
 app.use('/api', AuthRoutes);
+
+app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument)
+);
 
 module.exports = app;
