@@ -3,7 +3,6 @@ const cookieParser = require('cookie-parser');
 const UserRoutes = require('../routes/user.route');
 const GroupRoutes = require('../routes/group.route');
 const AuthRoutes = require('../routes/auth.route');
-const { successResponse, StatusCodes } = require('../services/api.service');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../swagger-output.json');
 const app = express();
@@ -17,7 +16,16 @@ const startTime = (new Date()).toLocaleString();
 
 /* API root */
 app.get('/', (req, res) => {
-    successResponse(res, StatusCodes.OK, { alive: 'True', start_time: startTime }, 'Server working');
+    // successResponse(res, StatusCodes.OK, { alive: 'True', start_time: startTime }, 'Server working');
+    res.send(`
+    <h2>Group chat APIs</h2>
+    <h3> Server alive </h3>
+    <p> Live since: ${startTime}</p>
+    <p>APIs hosted at <b><i>/api</i></b></p>
+    <p>Visit swagger docs to experiment with apis</p>
+    <p><a href="/api-docs">Swagger docs</a></p>
+    <p><a href="https://github.com/jagshila/group_chat_v1">Github link</a>
+    `);
 });
 
 /* Telling the server to use the routes */
