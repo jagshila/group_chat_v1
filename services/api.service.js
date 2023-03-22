@@ -38,6 +38,7 @@ const errorResponse = (res, error, msg = 'Something went wrong at server') => {
         return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Duplicate entries not allowed');
     }
 
+    console.log(error);
     failureResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {}, msg);
 };
 
