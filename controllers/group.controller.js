@@ -161,7 +161,7 @@ const getGroupMembers = async (req, res) => {
         const memberData = await Group.findOne({ _id: id }, { members: { $slice: [(page - 1) * maxRecords, maxRecords + 1] } });
         const members = memberData.members;
         const pagination = {
-            prev: page === 1 ? '' : `/groups/:${id}/members?page=${page - 1}`,
+            prev: page <= 1 ? '' : `/groups/:${id}/members?page=${page - 1}`,
             next: members.length > maxRecords ? `/groups/:${id}/members?page=${page + 1}` : ''
         };
         successResponse(res, StatusCodes.OK, { members: members.slice(0, maxRecords).filter(m => !m.is_deleted), pagination }, 'Members fetched successfully');

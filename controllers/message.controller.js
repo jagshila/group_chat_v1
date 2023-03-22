@@ -2,6 +2,7 @@ const { StatusCodes, successResponse, failureResponse, errorResponse } = require
 const Group = require('../models/schema/group.model');
 const JoinedGroups = require('../models/schema/joinedgroup.model');
 const Messages = require('../models/schema/message.model');
+const Likes = require('../models/schema/likes.model');
 const { ObjectId } = require('mongoose').Types;
 const deletedUserMsg = {
     message: 'You are no longer member of this group.',
@@ -62,9 +63,11 @@ const getUserMessages = async (req, res) => {
         const skip = (bucketPage - 1) * maxRecords;
         const records = isDeletedUser ? lastMessageSeen % maxRecords : maxRecords;
         const messageData = await Messages.findOne({ group_id: groupId, bucket_id: bucketId }, { messages: { $slice: [skip, records] } });
-        const messages = messageData.messages.map(msg => {
-            return { ...msg._doc, display_name: displayNameMap[msg.from] };
-        });
+        const messages = messageData
+            ? messageData.messages.map(msg => {
+                return { ...msg._doc, display_name: displayNameMap[msg.from] };
+            })
+            : [];
 
         const updatedMessageSeen = (page - 1) * maxRecords + messages.length;
         if (updatedMessageSeen > joinedGroup.joined_groups[0].message_viewed) {
@@ -73,7 +76,7 @@ const getUserMessages = async (req, res) => {
         }
         if (isDeletedUser) { messages.push(deletedUserMsg); }
         const pagination = {
-            prev: page === 1 ? '' : `/groups/${groupId}/messages?page=${page - 1}`,
+            prev: page <= 1 ? '' : `/groups/${groupId}/messages?page=${page - 1}`,
             next: page * maxRecords < totalMessages ? `/groups/${groupId}/messages?page=${page + 1}` : ''
         };
 
@@ -123,12 +126,19 @@ const addMessageLike = async (req, res) => {
             return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Only users of the group can like messages');
         }
 
+        const alreadyLiked = await Likes.exists({ user_id: res.locals.userId, message_id: messageId });
+
+        if (alreadyLiked) {
+            return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Message already liked');
+        }
+
         const updated = await Messages.updateOne({ group_id: groupId, 'messages._id': new ObjectId(messageId) },
             {
                 $inc: { 'messages.$.likes': 1 }
             });
 
         if (updated.modifiedCount) {
+            await (new Likes({ user_id: res.locals.userId, message_id: messageId })).save();
             return successResponse(res, StatusCodes.OK, {}, 'Message liked successfully');
         } else {
             return failureResponse(res, StatusCodes.BAD_REQUEST, {}, 'Message not found in this group');

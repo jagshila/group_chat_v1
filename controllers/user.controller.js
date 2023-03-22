@@ -47,7 +47,7 @@ const getUsers = async (req, res) => {
         const users = await User.find({ $or: [{ user_name: query }, { display_name: query }] }, { password: 0, change_password: 0 })
             .skip((page - 1) * maxRecords).limit(maxRecords + 1);
         const pagination = {
-            prev: page === 1 ? '' : `/users?page=${page - 1}`,
+            prev: page <= 1 ? '' : `/users?page=${page - 1}`,
             next: users.length > maxRecords ? `/users?page=${page + 1}` : ''
         };
         successResponse(res, StatusCodes.OK, { users: users.slice(0, maxRecords), pagination }, 'Users fetched successfully');
